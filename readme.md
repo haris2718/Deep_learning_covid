@@ -1,135 +1,124 @@
-# 🧠 Ανάλυση Ακτινογραφιών για Διάγνωση COVID-19 με Χρήση Βαθιάς Μάθησης
+#  Chest X-ray Analysis for COVID-19 Diagnosis Using Deep Learning
 
-## 🔬 Εισαγωγή
+##  Introduction
 
-Το παρόν έργο εστιάζει στην **ανάλυση ακτινογραφιών θώρακα** με στόχο την **ταξινόμησή τους σε τρεις διακριτές κατηγορίες**: υγιείς ασθενείς, ασθενείς με COVID-19 και ασθενείς με κοινή πνευμονία. Για την υλοποίηση αυτής της πρόκλησης χρησιμοποιήθηκε η μεθοδολογία της **βαθιάς μάθησης (Deep Learning)**, με βασικό εργαλείο τη βιβλιοθήκη **TensorFlow/Keras**, και συγκεκριμένα ένα **συνελικτικό νευρωνικό δίκτυο (CNN)** βασισμένο στην αρχιτεκτονική VGG16. Η βαθιά μάθηση επιτρέπει στο μοντέλο να **εξάγει αυτόματα χαρακτηριστικά από τις εικόνες**, χωρίς την ανάγκη για χειροκίνητη επιλογή, κάτι που είναι ιδιαίτερα χρήσιμο στην ιατρική απεικόνιση.
+This project focuses on the **analysis of chest X-rays** with the goal of **classifying them into three distinct categories**: healthy patients, COVID-19 patients, and patients with common pneumonia. We employed **Deep Learning** methodologies using **TensorFlow/Keras**, specifically building a **Convolutional Neural Network (CNN)** based on the VGG16 architecture. 
 
-Η **διαδικασία εκπαίδευσης** περιλαμβάνει αρκετά βήματα: αρχικά πραγματοποιείται **προεπεξεργασία των εικόνων** με κανονικοποίηση τιμών pixel και **αύξηση δεδομένων (data augmentation)**, η οποία βοηθά στη δημιουργία ποικιλίας δεδομένων από περιορισμένο πλήθος αρχικών εικόνων. Τεχνικές όπως περιστροφή, μετατόπιση και zoom εφαρμοστήκαν για να ενισχύσουν τη γενίκευση του μοντέλου και να περιορίσουν το **φαινόμενο της υπερεκπαίδευσης (overfitting)** — δηλαδή το να "θυμάται" το μοντέλο υπερβολικά καλά τα δεδομένα εκπαίδευσης εις βάρος της απόδοσής του σε νέα, άγνωστα δεδομένα.
+The **training process** involved several steps: initially, the images underwent **preprocessing**, including pixel value **normalization** and data **augmentation**, which enhanced dataset diversity through rotations, shifts, and zoom transformations. These techniques help mitigate **overfitting**, where a model memorizes the training data but performs poorly on unseen examples.
 
-Κατά την εκπαίδευση, εφαρμόστηκαν **dropout layers** (τυχαία απενεργοποίηση νευρώνων), μεταβολή του **ρυθμού μάθησης (learning rate scheduling)** και χρήση **προ-εκπαιδευμένων βαρών** από το ImageNet (transfer learning), ώστε να επιτευχθεί ταχύτερη σύγκλιση και καλύτερη γενίκευση. Επιπλέον, χρησιμοποιήθηκαν callbacks όπως το `ModelCheckpoint` και `ReduceLROnPlateau` για την αποθήκευση των καλύτερων μοντέλων και την αυτόματη ρύθμιση του ρυθμού μάθησης αντίστοιχα. Η αξιολόγηση έγινε με βάση τις μετρικές **accuracy**, **loss**, και **val_accuracy**, με την πρόοδο να καταγράφεται και να οπτικοποιείται γραφικά.
+During training, we implemented **dropout layers** (randomly disabling neurons), **learning rate scheduling**, and leveraged **pre-trained weights** from ImageNet (transfer learning) to achieve faster convergence and improved generalization. We also used callbacks such as `ModelCheckpoint` and `ReduceLROnPlateau` for saving optimal models and automatic learning rate adjustments. Evaluation metrics included **accuracy**, **loss**, and **validation accuracy**, which were tracked and visualized throughout training.
 
-Τέλος, το μοντέλο έχει τη δυνατότητα να αποθηκεύει τις βέλτιστες παραμέτρους του σε μορφή **CSV**, ενώ υποστηρίζει **εύκολη παραμετροποίηση** μέσω μεταβλητών όπως ο ρυθμός μάθησης, το batch size, και η διάρκεια εκπαίδευσης (epochs). Μέσω αυτής της προσέγγισης, καθίσταται δυνατή η δημιουργία ενός εργαλείου που μπορεί δυνητικά να συνεισφέρει στην **αυτόματη διάγνωση** και στην **υποβοήθηση του ιατρικού προσωπικού**, ειδικά σε περιόδους πίεσης όπως η πανδημία COVID-19.
+Finally, the model can **store optimal parameters** in a **CSV file**, and supports **easy customization** through adjustable parameters like learning rate, batch size, and number of epochs. This approach aims to create a tool that can **assist in automatic diagnosis** and **support medical personnel**, especially under the strain of a pandemic like COVID-19.
 
-## 📌  Συνοπτική περιγραφή του project
+##  Project Overview
 
-Αυτό το υποσύστημα αποτελεί μέρος ενός ολοκληρωμένου έργου βαθιάς μάθησης με στόχο τη **διάγνωση ασθενειών από ακτινογραφίες θώρακα**. Το μοντέλο που αναπτύσσεται ταξινομεί τις ακτινογραφίες σε τρεις κατηγορίες:
+This subsystem is part of a broader deep learning initiative for **disease diagnosis from chest X-rays**. The developed model classifies X-rays into three categories:
 
-- ✅ Υγιής (Healthy)
-- 🦠 Ασθενής με COVID-19
-- 🌫️ Ασθενής με κοινή πνευμονία
+-  Healthy
+-  COVID-19 Patient
+-  Pneumonia Patient
 
-Χρησιμοποιεί σύγχρονες τεχνικές της τεχνητής νοημοσύνης και βασίζεται σε προ-εκπαιδευμένα μοντέλα όπως το **VGG16**.
+It leverages state-of-the-art artificial intelligence techniques and builds upon pre-trained models like **VGG16**.
 
 ---
 
-## 🚀 Τεχνολογίες
+##  Technologies
 
 - **Python**
-- **TensorFlow & Keras** (deep learning)
-- **OpenCV** (επεξεργασία εικόνας)
-- **Pandas & NumPy** (χειρισμός δεδομένων)
-- **Matplotlib** (οπτικοποίηση)
-- **Google Colab / Google Drive** – Εκτέλεση και αποθήκευση
-
-
----
-
-## ⚙️ Λειτουργίες
-
-### 1. Προεπεξεργασία Δεδομένων
-
-- **Κανονικοποίηση** των εικόνων (rescaling σε [0,1]).
-- **Data Augmentation** με χρήση `ImageDataGenerator`:
-  - Περιστροφή, μετατοπίσεις, ζουμ, shear.
-  - Μείωση overfitting με αλλαγές στις εικόνες.
-- Διαχωρισμός των δεδομένων σε **training** και **validation set** με ισορροπημένες κατηγορίες.
-
-
-### 2. Δημιουργία Μοντέλου
-
-- Βασισμένο στο **VGG16** με βάρη από ImageNet (`include_top=False`).
-- Τα αρχικά layers του μοντέλου **παγώνουν** για να διατηρηθούν οι προκαθορισμένες γνώσεις.
-- Προστίθενται πλήρως συνδεδεμένα layers (Dense) και dropout για αποφυγή overfitting.
-- Τελικό layer με **softmax** για τριπλή κατηγοριοποίηση.
-
-### 3. Εκπαίδευση & Αξιολόγηση
-
-- Ορισμός batch size, αριθμού εποχών, validation split
-- Υποστήριξη **συνέχισης εκπαίδευσης** από προϋπάρχον μοντέλο (`load_weights`)
-- Χρήση callbacks όπως `ModelCheckpoint`, `ReduceLROnPlateau`
-   - ModelCheckpoint: Αποθήκευση του καλύτερου μοντέλου με βάση τη val_accuracy.
-   - ReduceLROnPlateau: Αυτόματη μείωση learning rate αν δεν βελτιώνεται η απόδοση.
-   - LearningRateScheduler: Σταδιακή αλλαγή του learning rate.
-   - Custom Monitoring Callback: Εκτύπωση πληροφοριών ανά εποχή, χρόνος εκτέλεσης και διαφορά val_acc - acc.
-- Ρύθμιση Learning Rate Scheduling με συνάρτηση lr_schedule (μείωση του ρυθμού όσο αυξάνονται οι εποχές εκπαίδευσης)
-- Υπολογισμός accuracy, precision, recall 
-
-### 4. Αποθήκευση & Αναφορά
-
-- Αποθήκευση εκπαιδευμένων μοντέλων σε φάκελο `saved_models_VGG16validation`
-- Οπτικοποίηση αποτελεσμάτων με διαγράμματα
-   - Γραφήματα Loss vs Val Loss
-     
-     <p align="left">
-      <img src="https://github.com/haris2718/Deep_learning_covid/blob/main/assets/Loss.png" width="25%" hspace="10" />  
-     </p>
-     
-   - Γραφήματα Accuracy vs Val Accuracy
-     <p align="left">
-      <img src="https://github.com/haris2718/Deep_learning_covid/blob/main/assets/Accuracy.png" width="25%" hspace="10" />  
-     </p>
-- Αποθήκευση αποτελεσμάτων σε `.csv`
+- **TensorFlow & Keras** (Deep Learning)
+- **OpenCV** (Image Processing)
+- **Pandas & NumPy** (Data Handling)
+- **Matplotlib** (Visualization)
+- **Google Colab / Google Drive** (Execution and Storage)
 
 ---
 
-## 📁 Δομή Δεδομένων
+##  Features
+
+### 1. Data Preprocessing
+
+- **Normalization** of images (rescaling pixel values to [0,1])
+- **Data Augmentation** using `ImageDataGenerator`:
+  - Rotation, shifting, zooming, shearing
+  - Overfitting reduction by image transformations
+- Splitting data into **training** and **validation sets** with balanced categories
+
+### 2. Model Development
+
+- Based on **VGG16** with ImageNet weights (`include_top=False`)
+- Initial model layers are **frozen** to retain pre-learned features
+- Added fully connected (Dense) layers and dropout for overfitting prevention
+- Final layer uses **softmax** for three-class classification
+
+### 3. Training & Evaluation
+
+- Set batch size, number of epochs, validation split
+- **Resume training** from existing weights (`load_weights`)
+- Use of callbacks:
+  - `ModelCheckpoint`: Saves best model based on validation accuracy
+  - `ReduceLROnPlateau`: Automatically reduces learning rate on performance plateau
+  - `LearningRateScheduler`: Progressive learning rate adjustment
+  - Custom Callback: Print training information, execution time, and accuracy gaps
+- Learning Rate Scheduling via `lr_schedule` function
+- Calculation of accuracy, precision, and recall
+
+### 4. Saving & Reporting
+
+- Save trained models in `saved_models_VGG16validation/`
+
+- Visualize results with graphs:
+
+  - Loss vs Validation Loss
+
+  - Accuracy vs Validation Accuracy
+
+- Save metrics to `.csv`
+
+---
+
+##  Data Structure
 
 ```bash
 project/
 ├── extracted_files/
-│   ├── train_images/              # Εικόνες εκπαίδευσης
-│   ├── labels_train.csv           # Ετικέτες για το train set
+│   ├── train_images/              # Training images
+│   ├── labels_train.csv           # Labels for the training set
 │   └── saved_models_VGG16validation/
-│       └── <αποθηκευμένα_μοντέλα>.h5
-
+│       └── <saved_models>.h5
 ```
 
-### 🧪 Αρχείο Πρόβλεψης με Προεκπαιδευμένο Μοντέλο 
+###  Prediction File with Pre-Trained Model
 
-Το αρχείο predict.ipynb υλοποιεί τη διαδικασία φόρτωσης του μοντέλου που εκπαιδεύτηκε προηγουμένως, χρησιμοποιεί τα αποθηκευμένα βάρη από το βέλτιστο checkpoint για την ταξινόμηση ακτινογραφιών θώρακα σε τρεις κατηγορίες: Healthy, Pneumonia και COVID-19. Με αυτόν τον τρόπο, αξιολογείται η ικανότητα γενίκευσης του μοντέλου σε νέα, άγνωστα δεδομένα.
+The `predict.ipynb` file loads the previously trained model, using saved weights from the best checkpoint, to classify chest X-rays into Healthy, Pneumonia, or COVID-19 categories. This evaluates the model’s ability to generalize to new, unseen data.
 
-**Κύρια σημεία:**
-- Φόρτωση και αξιολόγηση του συνδυαστικού μοντέλου VGG16 + custom layers.
-- Χρήση `ImageDataGenerator` για τυποποίηση εικόνων στο σύνολο δοκιμής.
-- Εξαγωγή προβλέψεων με softmax και αποθήκευση αποτελεσμάτων σε `.csv`.
-- Οι προβλέψεις περιλαμβάνουν την αντίστοιχη εικόνα και το τελικό class ID.
+**Key Steps:**
 
-**Έξοδος:**  
-Ένα αρχείο `.csv` με τις τελικές προβλέψεις του μοντέλου για κάθε εικόνα, χρήσιμο για μεταγενέστερη ανάλυση ή οπτικοποίηση αποτελεσμάτων.
+- Load and evaluate the VGG16 + custom layers model
+- Standardize test set images using `ImageDataGenerator`
+- Extract predictions with softmax and save results to `.csv`
+- Predictions include corresponding image ID and final class ID
 
-Ορίστε μια ωραία περιγραφή για αυτό το αρχείο, την οποία μπορείς να χρησιμοποιήσεις στο `README.md` σου:
-
----
-
-### 🧱 Προεπεξεργασία Εικόνων – Padding Εικόνων Ακτινογραφίας
-
-Το αρχείο image_folder_padding.py υλοποιεί μια διαδικασία προεπεξεργασίας εικόνων όπου εφαρμόζεται **padding** (προσθήκη περιθωρίου) ώστε όλες οι εικόνες να έχουν τις ίδιες διαστάσεις, με βάση τη μεγαλύτερη εικόνα του dataset. Η διαδικασία πραγματοποιείται με χρήση της βιβλιοθήκης `OpenCV` και εξάγει τις νέες εικόνες σε ξεχωριστό φάκελο.
-
-🔍 **Λειτουργίες του script:**
-- Ανίχνευση της μεγαλύτερης εικόνας στο dataset (σε πλάτος & ύψος).
-- Εφαρμογή μαύρου padding (border) ώστε κάθε εικόνα να γίνει ίση σε μέγεθος με τη μεγαλύτερη.
-- Διατήρηση του περιεχομένου στο κέντρο της εικόνας (κεντραρισμένο padding).
-- Αποθήκευση των νέων εικόνων σε φάκελο εξόδου (`output_folder`).
-
-🧠 **Γιατί είναι σημαντικό στη βαθιά μάθηση:**
-Στα μοντέλα βαθιάς μάθησης, όπως τα CNNs, είναι απαραίτητο οι είσοδοι (input images) να έχουν **σταθερές διαστάσεις**. Η συγκεκριμένη τεχνική padding:
-- **Διατηρεί την αναλογία** και τις πληροφορίες της αρχικής εικόνας.
-- **Προστατεύει** από την παραμόρφωση που μπορεί να προκύψει με το απλό resize.
-- Βοηθά το δίκτυο να **μάθει πιο σταθερά πρότυπα** χωρίς να επηρεάζεται από διαφορετικά μεγέθη εικόνων.
-
-Αυτό το preprocessing βήμα είναι κρίσιμο, ειδικά σε datasets ακτινογραφιών όπου οι λεπτομέρειες στην άκρη της εικόνας μπορεί να έχουν διαγνωστική αξία.
+**Output:**
+A `.csv` file containing the final predictions, useful for further analysis or visualization.
 
 ---
 
+###  Image Preprocessing - Padding Chest X-rays
 
+The `image_folder_padding.py` script performs image preprocessing by applying **padding** to ensure all images have consistent dimensions, based on the largest image in the dataset. This is achieved using `OpenCV`, outputting the resized images to a separate folder.
+
+ **Script Functions:**
+
+- Detect the largest image (width & height) in the dataset
+- Apply black padding (borders) so all images match the largest dimensions
+- Center the original image within the new padded image
+- Save the padded images to an `output_folder`
+
+ **Why Padding is Important for Deep Learning:**
+
+- Ensures **consistent input size** for CNNs
+- **Preserves image aspect ratios** without distortion
+- Helps the network **learn stable features** without being affected by varying image sizes
+
+This preprocessing step is crucial, especially for medical X-ray datasets where **edge details** can have diagnostic significance.
 
